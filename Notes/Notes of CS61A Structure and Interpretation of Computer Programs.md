@@ -52,6 +52,12 @@ In evaluating nested call expressions, the interpreter is itself following a pro
 
 However, the above evaluation procedure doesn't suffice to evaluate all Python code. In general, **statements** like `x = 4` are not evaluated but executed. Each type of expression or statement has its own evaluation or execution procedure.
 
+++++
+
+Pure functions: functions have some input(their arguments) and return some output(the result of applying them).
+
+Non-pure functions: In addition to returning a value, applying a non-pure function can generate *side effects*, which make some change to the state of the interpreter or computer. For example, `print`.
+
 ### 1.3 Defining new functions
 
 Function is an abstraction: binds name to expression.
@@ -95,7 +101,7 @@ Within a frame, a name can never be repeated, and it has to be bound to at most 
 
 Assignment statements change bindings between names and values in frame.
 
-### 1.4 Designing functions
+### 1.4 Designing functions   
 
 + A function's domain is the set of all inputs it might possibly take as arguments.
 + A function's range is the set of  all outputs it might possibly return.
@@ -136,6 +142,228 @@ Some suggestions to implementing functions:
         k = 1.38e-23  # Boltzmann's constant
         return n * k * t / v
 ```
+
+### 1.5 Control
+
+Test. Here is to be implemented after exercises.
+
+### 1.6 Higher-order functions
+
+Functions are first-class: Functions can be manipulated as values in Python.
+
+Higher-order function: A function that takes a function as an argument value or returns a function as a return value.
+
++++++
+
+Functions as arguments:
+
+```python
+"""
+Calculates the golden ratio.
+"""
+def improve(update, close, guess=1):
+    while not close(guess):
+        guess = update(guess)
+    return guess
+
+def golden_update(guess):
+    return 1/guess + 1
+
+def square_close_to_successor(guess):
+    return approx_eq(guess * guess, guess + 1)
+
+def approx_eq(x, y, tolerance=1e-3):
+    return abs(x - y) < tolerance
+
+phi = improve(golden_update, square_close_to_successor)
+```
+
++++++
+
+The above implementation causes global frame cluttered with names of small unique functions, each of which has a paticular function signature(constraints on number of parameter), making it less general.
+
+Considering *nested definition* to address these two questions:
+
+```python
+"""
+Nested definition implementation of calculation of golden ratio.
+"""
+def improve(guess=1):
+    def update(guess):
+        return 1/guess + 1
+    def close(guess):
+        return approx_eq(guess * guess, guess + 1)
+    while not close(guess):
+        guess = update(guess)
+    return guess
+
+def approx_eq(x, y, tolerance=1e-3):
+    return abs(x - y) < tolerance
+
+phi = improve()
+```
+
+Or we can use *lambda*:
+
+```python
+"""
+Lambda implementation of calculation of golden ratio.
+We can understand the structure of a lambda expression by constructing a corresponding English sentence:
+	lambda			  x			   :		  f(g(x))
+"A function that	takes x		and returns		f(g(x))"
+"""
+def improve(update, close, guess=1):
+    while not close(guess):
+        guess = update(guess)
+    return guess
+
+def approx_eq(x, y, tolerance=1e-3):
+    return abs(x - y) < tolerance
+
+phi = improve(lambda x : 1 / x + 1,
+              lambda x : approx_eq(x * x, x + 1))
+```
+
++++++
+
+*Functions as return values*:
+
+```python
+def square(x):
+    return x * x
+
+def successor(x):
+    return x + 1
+
+def composel(f, g):
+    def h(x):
+        return f(g(x))
+    return h
+square_successor = composel(square, successor)
+result = square_successor(12)
+# result = composel(square, successor)(12)	# This statement has the same effect.
+```
+
+++++++
+
+An exercise on Newton's method:
+
+````python
+def approx_eq(x, y):
+    return abs(x - y) < 1e-10
+
+def newton_method(f, df):
+    def update(x):
+        return x - f(x) / df(x)
+    def close(x):
+        return approx_eq(f(x), 0)
+    geuss = 1
+    while not close(guess):
+        guess = update(guess)
+    return guess
+
+root_of_cube = newton_method(lambda x : x * x * x - 27,
+                             lambda x : 3 * x * x)
+````
+
+++++
+
+Currying: Transforming a multi-argument function into a single-argument, higher-order function.
+
+````python
+"""
+Examples of currying.
+"""
+def curry2(f):
+    def g(x):
+        def h(y):
+            return f(x, y)
+        return h
+    return g
+
+# Equivalence of representation of lambda
+curry2 = lambda f : lambda x : lambda y : f(x, y)
+
+# Some usages of curry2
+m = curry2(add)
+add_three = m(3)
+assert add_three(2) == 5, "add(3, 2) returns 5"
+assert m(5)(201) == 206, "add(5, 201) returns 206"
+assert curry2(add)(1)(2) == 3, "add(1, 2) returns 3"
+````
+
+Note: my python3.10 can sucessfully run above codes, while they fail at Python Tutor Online, due to the version probably.
+
+++++
+
+Lambda expressions are expressions that evaluate to a function.
+
+`lambda x : x * x` means "A funtion with a parameter x that returns the value of x * x".
+
+Note: **lambda expressions in Python cannot contain statements at all**. So do not try to use `while` or `if` in a lambda expression.
+
+The difference between
+
+```python
+square = lambda x : x * x
+```
+
+and 
+
+```python
+def square(x):
+    return x * x
+```
+
+is that the former creates the function with no name at all and the assignment statement binds the function value to the name square, wheras the latter creates the square function and binds it to the name of square, and all these happen automatically and are the byproduct of executing the def statement. In a word, only def statement gives a function intrinsic name.
+
++++
+
+*Decorator* is a special syntax to apply higher-order functions as part of executing a `def` statement. 
+
+Here is an examplel:
+
+```python
+# The trace() is a function that takes a function as argument
+def trace(fn):
+    def wrapped(x):
+        print("Call" fn "on argument" x)
+        return fn(x)
+    return wrapped
+
+# Below two piece of codes have the same effect
+# Use @trace
+@trace
+def triple(x):
+    return 3 * x
+# don't use @trace
+def triple(x):
+    return 3 * x
+triple = trace(triple)
+```
+
+### 1.7 Recursive functions
+
+Exercise: inverse cascade
+
+```python
+"""
+Prints an inverse cascade.
+"""
+def inverse_cascade(n):
+    grow(n)
+    print(n)
+    shrink(n)
+def f_then_g(f, g, n):
+    if n:
+        f(n)
+        g(n)
+grow = lambda n : f_then_g(grow, print, n // 10)
+shrink = lambda n : f_then_g(print, shrink, n // 10)
+inverse_cascade(1234)
+```
+
+
 
 ## Chapter 2: Building Abstractions with Data
 
