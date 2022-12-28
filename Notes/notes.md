@@ -15,7 +15,7 @@ The high productivity of computer science is only possible because the disciplin
 
 +++
 
-Python excels as an instructional languafe because, throughout its history, Python's developers have emphasized the human interpretability of Python code, reinforced by the [Zen of Python](http://www.python.org/dev/peps/pep-0020/) guiding priciples of beauty, simplicity, and readability.
+Python excels as an instructional language because, throughout its history, Python's developers have emphasized the human interpret-ability of Python code, reinforced by the [Zen of Python](http://www.python.org/dev/peps/pep-0020/) guiding principles of beauty, simplicity, and readability.
 
 > A language isn't something you learn so much as something you join.
 >
@@ -36,7 +36,7 @@ In evaluating nested call expressions, the interpreter is itself following a pro
 + **Evaluate** the operator and operand subexpressions, then
 + **Apply** the function that is the value of the operator subexpression **to** the arguments that are the values of the operand subexpressions.
 
-> This part of evaluating a call expression reminds me of the *post-order tranverse of binaty tree* and *postfix expression*. And the illustration is called exactly an ***expression tree***.
+> This part of evaluating a call expression reminds me of the *post-order traverse of binary tree* and *postfix expression*. And the illustration is called exactly an ***expression tree***.
 >
 > <img src="images/image-20221208221859928.png" alt="image-20221208221859928" style="zoom:80%;" />
 >
@@ -48,7 +48,9 @@ In evaluating nested call expressions, the interpreter is itself following a pro
 >
 > + A name evaluates to the value associated with that name in the current environment.
 >
->   > **Environment** is the alies of memory that keeps track of the names, values, and binding.
+>   > **Environment** is the allies of memory that keeps track of the names, values, and binding.
+>
+> **NOTE: The order is very important!** The execution order of the expression is similar to C comma expression, which is executed from left to right.
 
 However, the above evaluation procedure doesn't suffice to evaluate all Python code. In general, **statements** like `x = 4` are not evaluated but executed. Each type of expression or statement has its own evaluation or execution procedure.
 
@@ -145,7 +147,25 @@ Some suggestions to implementing functions:
 
 ### 1.5 Control
 
-Test. Here is to be implemented after exercises.
+Maybe some tips will help. 
+
+Command `python3 -i file.py` allows you to run a Python script interactively. Command `python3 -m doctest` is helpful when you want to run all the unit test in a script. An example of these unit tests is following:
+
+````python
+def always_true(x):
+    """No matter what input argument is, the return value is true.
+    
+    >>> 1
+    True
+    >>> 0
+    True
+    >>> None
+    True
+    >>> False
+    True
+    """
+    return True
+````
 
 ### 1.6 Higher-order functions
 
@@ -180,7 +200,7 @@ phi = improve(golden_update, square_close_to_successor)
 
 +++++
 
-The above implementation causes global frame cluttered with names of small unique functions, each of which has a paticular function signature(constraints on number of parameter), making it less general.
+The above implementation causes global frame cluttered with names of small unique functions, each of which has a particular function signature(constraints on number of parameter), making it less general.
 
 Considering *nested definition* to address these two questions:
 
@@ -209,7 +229,7 @@ Or we can use *lambda*:
 """
 Lambda implementation of calculation of golden ratio.
 We can understand the structure of a lambda expression by constructing a corresponding English sentence:
-	lambda			  x			   :		  f(g(x))
+	lambda			  x			   	:		    f(g(x))
 "A function that	takes x		and returns		f(g(x))"
 """
 def improve(update, close, guess=1):
@@ -292,7 +312,7 @@ assert m(5)(201) == 206, "add(5, 201) returns 206"
 assert curry2(add)(1)(2) == 3, "add(1, 2) returns 3"
 ````
 
-Note: my python3.10 can sucessfully run above codes, while they fail at Python Tutor Online, due to the version probably.
+Note: my python 3.10 can successfully run above codes, while they fail at Python Tutor Online, due to the version probably.
 
 ++++
 
@@ -315,13 +335,13 @@ def square(x):
     return x * x
 ```
 
-is that the former creates the function with no name at all and the assignment statement binds the function value to the name square, wheras the latter creates the square function and binds it to the name of square, and all these happen automatically and are the byproduct of executing the def statement. In a word, only def statement gives a function intrinsic name.
+is that the former creates the function with no name at all and the assignment statement binds the function value to the name square, whereas the latter creates the square function and binds it to the name of square, and all these happen automatically and are the byproduct of executing the def statement. In a word, only def statement gives a function intrinsic name.
 
 +++
 
 *Decorator* is a special syntax to apply higher-order functions as part of executing a `def` statement. 
 
-Here is an examplel:
+Here is an example:
 
 ```python
 # The trace() is a function that takes a function as argument
