@@ -1,3 +1,2 @@
-*.ok_history
-*.ok_storage
+*.ok_*
 *.swp
