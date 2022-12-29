@@ -401,3 +401,39 @@ inverse_cascade(1234)
 
 
 
+## Appendix
+
+### A. Debugging
+
+````
+Traceback (most recent call last):
+  File "<pyshell#29>", line 3 in <module>
+    result = buggy(5)
+  File <pyshell#29>", line 5 in buggy
+    return f + x
+TypeError: unsupported operand type(s) for +: 'function' and 'int'
+````
+
+The most recent function call of a *traceback* message is at the bottom.
+
+The very last line in the traceback message is the error statement(`<error type>: <error message>`).
+
++++++
+
+A trick to enable long-term debugging:
+
+```python
+debug = True
+
+def foo(n):
+i = 0
+while i < n:
+    i += func(i)
+    if debug:
+        print('DEBUG: i is', i)
+```
+
+++++
+
+
+
