@@ -67,7 +67,7 @@ def is_swap(player_score, opponent_score):
     """
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
-    return True if abs(player_score % 10 - opponent_score % 10) == opponent_score // 10 else False
+    return True if abs(player_score % 10 - opponent_score % 10) == opponent_score // 10 % 10 else False
     # END PROBLEM 4
 
 
@@ -268,6 +268,10 @@ def make_averaged(original_function, trials_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def repeadly_call(*args):
+        result = [original_function(*args) for _ in range(trials_count)]
+        return sum(result) / trials_count
+    return repeadly_call
     # END PROBLEM 8
 
 
@@ -282,6 +286,13 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    least, num_rolls = 0, 0
+    for num in range(1, 11):
+        score = make_averaged(roll_dice, trials_count)(num, dice)
+        if score > least:
+            least, num_rolls = score, num
+    assert num_rolls >= 1 and num_rolls <= 10, "number of dice is out of range"
+    return num_rolls
     # END PROBLEM 9
 
 
@@ -331,7 +342,7 @@ def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 6  # Replace this statement
+    return 0 if free_bacon(opponent_score) >= cutoff else num_rolls
     # END PROBLEM 10
 
 
@@ -341,7 +352,10 @@ def swap_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     non-beneficial swap. Otherwise, it rolls NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 6  # Replace this statement
+    bacon_score = free_bacon(opponent_score)
+    if is_swap(score + bacon_score, opponent_score):
+        return 0 if opponent_score > score + bacon_score else num_rolls
+    return 0 if free_bacon(opponent_score) >= cutoff else num_rolls
     # END PROBLEM 11
 
 
