@@ -109,7 +109,7 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
     prev, score, strategy = [0, 0], [score0, score1], [strategy0, strategy1]
-    while score[0] < goal and score[1] < goal:
+    while score0 < goal and score1 < goal:
         # Initialization of a turn.
         hog_flag, swap_flag, oppo = False, False, other(who)
         # Calculates num_roll and new_score for this turn.
@@ -126,11 +126,13 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
             score[who], score[oppo] = score[oppo], score[who]
         # End of a turn.
         who = other(who)
-    score0, score1 = score[0], score[1]
+        score0, score1 = score[0], score[1]
+        say = say(score0, score1)
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
     # BEGIN PROBLEM 6
     "*** YOUR CODE HERE ***"
+    # All codes are in the region of problem 5.
     # END PROBLEM 6
     return score0, score1
 
@@ -217,6 +219,16 @@ def announce_highest(who, last_score=0, running_high=0):
     assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    def say(score0, score1):
+        ls, rh = last_score, running_high
+        score = [score0, score1]
+        gain = score[who] - ls
+        if gain > rh:
+            rh = gain
+            print("%d point(s)! That's the biggest gain yet for Player %d"%(rh, who))
+        ls = score[who]
+        return announce_highest(who, ls, rh)
+    return say
     # END PROBLEM 7
 
 

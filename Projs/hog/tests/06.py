@@ -5,14 +5,14 @@ test = {
     {
       'cases': [
         {
-          'answer': '5e0e1a4c94a7429afae6399105d34f05',
+          'answer': 'Another commentary function.',
           'choices': [
             'Another commentary function.',
             'An integer representing the score.',
             'None.'
           ],
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'question': 'What does a commentary function return?'
         }
       ],
@@ -28,13 +28,12 @@ test = {
           ...     print(s0, s1)
           ...     return echo
           >>> s0, s1 = play(always_roll(1), always_roll(1), dice=make_test_dice(3), goal=5, say=echo)
-          d7882c94106188a2f424c5383b507923
-          b706c6a1e63c19ed82e4eb95fc6ba1cf
-          b57f18b04748377f05b1484da01f28e5
-          # locked
+          3 0
+          3 3
+          9 3
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
@@ -45,15 +44,14 @@ test = {
           ...         return count(n + 1)
           ...     return say
           >>> s0, s1 = play(always_roll(1), always_roll(1), dice=make_test_dice(3), goal=10, say=count(1))
-          eb6cc5cdf2dcda4c703cdbcd21f5cf2e
-          171f8c4ecc4156afed477dca7ce10d2e
-          42770ee9d7532fb28c11e9844d8c1e65
-          2dcc4e620fd1442ead74430ada359cd7
-          28f5c4d1dc504abc4af21b1f88db2f13
-          # locked
+          1 3
+          2 3
+          3 9
+          4 9
+          5 15
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
@@ -64,14 +62,13 @@ test = {
           >>> strat0 = lambda score, opponent: 1 - opponent // 10
           >>> strat1 = always_roll(3)
           >>> s0, s1 = play(strat0, strat1, dice=make_test_dice(4, 2, 6), goal=15, say=echo)
-          f4d41f4e29a08f003e0a9a5473c61d5e
-          461ff541bd06a2e3310447d10cc6615b
-          caedb1cff772abe19708326f743222d2
-          25a122abac000b953fec91f46575dbd9
-          # locked
+          4 0
+          4 12
+          12 13
+          12 25
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
