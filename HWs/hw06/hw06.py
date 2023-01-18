@@ -259,13 +259,13 @@ def path_yielder(t, value):
     def dfs(t, path):
         path.append(t.label)
         if t.label == value:
-            #yield path[:]
             paths.append(path[:])
         for b in t.branches:
             dfs(b, path)
         path.pop()
     dfs(t, [])
     yield from paths
+
 
 def remove_all(link , value):
     """Remove all the nodes containing value in link. Assume that the
@@ -285,6 +285,15 @@ def remove_all(link , value):
     <0 1>
     """
     "*** YOUR CODE HERE ***"
+    # Since I have no idea of the concepts of pointer to pointer, so I fail to write elegant code like Torvalds.
+    if link.rest == Link.empty:
+        return
+    else:
+        if link.rest.first == value:
+            link.rest = link.rest.rest
+        else:
+            link = link.rest
+        remove_all(link, value)
 
 
 def deep_map(f, link):
@@ -301,6 +310,12 @@ def deep_map(f, link):
     <<2 <4 6> 8> <<10>>>
     """
     "*** YOUR CODE HERE ***"
+    if link == Link.empty:
+        return link
+    else:
+        first = deep_map(f, link.first) if isinstance(link.first, Link) else f(link.first)
+        rest = deep_map(f, link.rest)
+        return Link(first, rest)
 
 
 class Tree:
