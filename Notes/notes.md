@@ -10,7 +10,7 @@
 
 ### 1.1 Getting started
 
-The high productivity of computer science is only possible because the discipline is built upon an elegant and powerful set of fundamental ideas. All computing begins with **representing information**, specifying **logic** to proces it, and designing **abstractions** that manage the complexity of that logic. Mastering these fundamentals will require us to understand precisely **how computers interpret computer programs and carry out computational processes**.
+The high productivity of computer science is only possible because the discipline is built upon an elegant and powerful set of fundamental ideas. All computing begins with **representing information**, specifying **logic** to process it, and designing **abstractions** that manage the complexity of that logic. Mastering these fundamentals will require us to understand precisely **how computers interpret computer programs and carry out computational processes**.
 
 > This fundamental ideas have long been taught using the classic textbook *Structure and Interpretation of Computer Programs* ([SICP](http://mitpress.mit.edu/sicp)).
 
@@ -571,6 +571,7 @@ Dictionaries.
 
 + A key of a dictionary cannot **be or contain** a mutable value.
 + The dictionary type supports various methods of iterating over the contents of the dictionary as a whole, such as `keys`, `values`, and `items`.
++ In Python 3.6+, the order of items in a dictionary is the order in which they were added, while items appeared in an varbitrary order for the Python 3.5 or an earlier version.
 
 +++++
 
@@ -619,15 +620,323 @@ Advanced topic of mutable data:
 
 ### 2.5 Object-oriented programming
 
+Class is the template of all its object.
 
+```python
+class <name>:
+    <suite>
+```
+
+A class statement creates a new class and binds that class to <name> in the first frame of the current environment. The <suite> is executed when the class statement is executed.
+
++++++
+
+Object construction:
+
+```python
+class <name>:
+    def __init__(self, *args):
+        <statements>
+```
+
+Object identity:
+
++ Every object that is an instance of a user-defined class has a unique identity.
++ Binding an object to a new name using assignment does not create a new object.
+
++++++
+
+All invoked methods have access to the object via the `self` parameter, and so they can **all access and manipulate the object's state**.
+
+Attributes are data stored within either an instance or a class itself. They can be accessed via a dot expression or a built-in function(`getattr()` or `hasattr()`).
+
+Python distinguished between:
+
++ *Functions*, and
++ *Bound methods*, which couple together a function and the object on which that method will be invoked.
+
+> $$
+> Object + Function = Bound\ Method
+> $$
+>
+> They have different types,
+>
+> ````python
+> >>> type(Account.deposit)
+> <class 'function'>
+> >>> type(tom_account.deposit)
+> <class 'method'>
+> ````
+>
+> and different usages.
+>
+> ```python
+> >>> Account.deposit(tom_account, 1001)
+> 1011
+> >>> tom_account.deposit(1000)
+> 2011
+> ```
+
+To evaluate a dot expression ---- `<expression>.<name>`:
+
++ Evaluate the `<expression>` to the left of the dot, which yields the object of the dot expression.
++ `<name>` is matched against the instance attributes of that object; **if an attribute with that name exists**, its value is returned.
++ If not, `<name>` is looked up in the class, which yields a class attribute value.
++ That value is returned **unless it is a function**, in which case a *bound method* is returned instead.
+
+Class attributes are "shared" across all instances of a class because they are attributes of the class, not the instance.
+
+Assignment to attributes has the following rules:
+
++ If the object is an instance, then assignment sets an instance attribute.
++ If the object is a class, then assignment sets a class attribute.
+
++++++
+
+Practice 1:
+
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230113202912929.png" alt="image-20230113202912929" style="zoom:80%;" />
+>
+> Draw the diagram:
+>
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230113203005325.png" alt="image-20230113203005325" style="zoom:80%;" />
+>
+> Note:
+>
+> + `__repr__(self)` is what returned when an instance is called in an interactive session.
+> + `jack.greeting = 'Maam'` is the attribute assignment which will not change the bind of class attribute, instead it adds a bind of a instance attribute immediately.
+>
+> The answer is:
+>
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230113203133197.png" alt="image-20230113203133197" style="zoom:80%;" />
+>
+> Errata:
+>
+> ```python
+> >>> jack
+> "Peon"
+> ```
+
+Practice 2:
+
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230114111227268.png" alt="image-20230114111227268" style="zoom:80%;" />
+>
+> The diagram is:
+>
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230114111306501.png" alt="image-20230114111306501" style="zoom:80%;" />
+>
+> The answer is:
+>
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230114111338432.png" alt="image-20230114111338432" style="zoom:80%;" />
+
++++++
+
+Inheritance is a method for relating classes together.
+
+```python
+class <name>(<base class>):
+    <suite>
+```
+
+Conceptually, the new *subclass* "shares" attributes with its base class, while the subclass may *override* certain inherited attributes.
+
+To look up a name in a class:
+
++ If it names an attribute in the class, return the attribute value.
++ Otherwise, look up the name in the base class, if there is one.
+
+Designing for inheritance:
+
++ Don't repeat and use existing implementations.
++ Attributes that have been overridden are still accessible via class objects.(see above "to look up a name in class")
++ Look up attributes on instances whenever possible.
+
+Multiple inheritance
+
+````python
+class Subclass(Class1, Class2, ...):
+    def __init__(self, *args):
+        <statements>
+````
+
+### 2.7 Object abstraction
+
+String conversion:
+
++ `str()`: returns a human-readable string.
+
++ `repr()`: returns a Python expression that evaluates to an equal object.
+
+  ```python
+  repr(object) -> string
+  ```
+
+  Return the canonical string representation of the object. And for most object types, `eval(repr(object)) == object`.
+
++++++
+
+Polymorphic function: A function that applies to many(poly) different forms(morph) of data, such as `str()` and `repr()`(and `bool()` in the following instance).
+
+> Note that an instance attribute called `__repr__` is ignored, and **only class attribute** are found! So actual implementation of `repr()` is more likely to:
+>
+> ````python
+> def repr(x):
+>     return x.__repr__(x)
+> ````
+>
+> Here are differences of `str()`, `repr()` and instance attribute `__str__()` and `__repr__()`:
+>
+> + NO instance attribute:
+>
+>   <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117003843702.png" alt="image-20230117003843702" style="zoom:80%;" />
+>
+> + WITH instance attribute:
+>
+>   <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117004143740.png" alt="image-20230117004143740" style="zoom:80%;" />
+
+Special method names
+
++ They start and end with two underscores and have built-in behavior.
+
+  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117002842666.png" alt="image-20230117002842666" style="zoom:80%;" />
+
++ And the behavior of calling some built-in function equals to using the corresponding special methods:
+
+  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117003112766.png" alt="image-20230117003112766" style="zoom:80%;" />
+
+  This enables Python to have a great extensibility to write more interfaces like `str()` and `repr()`.
+
++++++
+
+Modular design:
+
+*Separation of concerns* is a design principle: Isolate different parts of a program that address different concerns. When you build one part of the program, the part should have to know as little as possible about other concerns that aren't its concern.
+
+Take Hog and Ants projects as examples:
+
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117001521341.png" alt="image-20230117001521341" style="zoom:80%;" />
+
+### 2.9 Recursive objects
+
+Property methods:
+
++ `@property` decorator: 
+
+  ````python
+  class Link:
+      ...
+      @property
+      def second(self):
+          return self.rest.first
+  ````
+
+  then if `s` is a `Link` object, `s.second() == s.second` returns `True`.
+
++ `@<attribute>.setter` decorator:
+
+  ````python
+  class Link:
+      ...
+      @<attribute>.setter
+      def second(self, value):
+          self.rest.first = value
+  ````
+
+  then if `s` is a `Link` object, `s.second = 6` will bind the `s.rest.first` to 6.
+
++++++
+
+Nothing more is interesting.
 
 ## Chapter 3: Interpreting Computer Programs
 
 
 
-
-
 ## Chapter 4: Data Processing
+
+### 4.2 Implicit sequences
+
+Iterators.
+
++ A container can provide an iterator that provides access to its elements in some order.
+
+  + `iter(iterable)`: Return an iterator over the elements of an iterable value.
+  + `next(iterator)`: Return the next element in an iterator.
+
++ An *iterable* value is any value that can be passed to `iter` to produce an iterator.
+
+  An iterator can be passed to `iter`, so it's also iterable.
+
++ An *iterator* is returned from `iter` and can be passed to `next`; all iterators are mutable.
+
++++++
+
+Built-in functions for iteration.
+
++ Many built-in Python sequence operations return **iterators** that compute results *lazily*.
+
+  > Here "lazily" means that the result is only computed by the interpreter only when it is requested.
+
+  The followings are some examples:
+
+  + `map(func, iterable)`: Iterate over func(x) for x in iterable.
+  + `filter(func, iterable)`: Iterate over x in iterable if func(x).
+  + `zip(first_iter, second_iter)`: Iterate over co-indexed (x, y) pairs.
+  + `reversed(sequence)`: Iterate over x in a sequence in a reverse order.
+
++ To view the contents of an iterator(it's iterable too!), place the resulting elements into a container. And to generate the container, all computation work will be done.
+
+  Use `list(iterable)`, `tuple(iterable)`, `sorted(iterable)`(creates a sorted list containing x in iterable).
+
++++++
+
+Generators.
+
++ A *generator function* is a function that **yield**s values instead of **return**ing them.
++ A normal function **return**s once; a *generator function* can **yield** multiple times.
++ A *generator* is an iterator created automatically by calling a *generator function*.
++ When a *generator function* is called, it returns a *generator* that iterates over its yields.
+
+Generators & Iterators.
+
++ A `yield from` statement yields all values from an iterator or iterable.
+
+  > To implement the following function:
+  >
+  > ```python
+  > >>> list(a_then_b([3, 4], [5, 6]))
+  > [3, 4, 5, 6]
+  > ```
+  >
+  > we can use `yield` or `yield from` statement.
+  >
+  > ````python
+  > # yield version
+  > def a_then_b(a, b):
+  >     for x in a:
+  >         yield x
+  >     for x in b:
+  >         yield y
+  > # yield from version
+  > def a_then_b(a, b):
+  >     yield from a
+  >     yield from b
+  > ````
+
++ And `yield from` can be used in recursion.
+
+  > `````python
+  > """
+  > >>> list(countdown(5))
+  > [5, 3, 2, 2, 1]
+  > """
+  > def countdown(k):
+  >     if k > 0:
+  >         yield k
+  >         yield from countdown(k - 1)
+  > `````
+  >
+  > Note that countdown is a generator function and creates a generator, so it is legal to `yield from` a generator created by `countdown`.
 
 
 
@@ -730,4 +1039,119 @@ Handling exceptions ------ try statements:
   + and the class of the exception inherits from `exception class`.
 
   The exception handled in `except suite` **will not cause an exception raised**.
+
+### B. Errata
+
+[Q5 "Joint Account"](https://inst.eecs.berkeley.edu/~cs61a/su20/hw/hw05/#q5) from `hw05.py`:
+
+> Suppose that our banking system requires the ability to make joint accounts.  Define a function `make_joint` that takes three arguments.
+>
+> 1. A password-protected `withdraw` function,
+> 2. The password with which that `withdraw` function was defined, and
+> 3. A new password that can also access the original account.
+>
+> If the password is incorrect or cannot be verified because the underlying account is locked, the `make_joint` should propagate the error. Otherwise, it returns a `withdraw` function that provides additional access to the original account using *either* the new or old password. Both functions draw from the same balance. Incorrect passwords provided to either function will be stored and cause the functions to be locked after three wrong attempts.
+>
+> *Hint*: The solution is short (less than 10 lines) and contains no string literals!  The key is to call `withdraw` with the right password and amount, then interpret the result.  You may assume that all failed attempts to withdraw will return some string (for incorrect passwords, locked accounts, or insufficient funds), while successful withdrawals will return a number.
+>
+> Use `type(value) == str` to test if some `value` is a string.
+
+Note that the parameter `withdraw` in `make_joint(withdraw, old_pass, new_pass)` is the function returned by `make_joint` previously called. And if the `withdraw` function is defined in the `make_joint`, different `withdraw` functions may be in different frames.
+
++++++
+
+[Q6 "Remainder Generator"](https://inst.eecs.berkeley.edu/~cs61a/su20/hw/hw05/#q6) from `hw05.py`:
+
+> Like functions, generators can also be *higher-order*. For this problem, we will be writing `remainders_generator`, which yields a series of generator objects.
+>
+> `remainders_generator` takes in an integer `m`, and yields `m` different generators. The first generator is a generator of multiples of `m`, i.e. numbers where the remainder is 0. The second is a generator of natural numbers with remainder 1 when divided by `m`. The last generator yields natural numbers with remainder `m - 1` when divided by `m`.
+>
+> > *Hint*: You can call the `naturals` function to create a generator of infinite natural numbers.
+>
+> > *Hint*: Consider defining an inner generator function. Each yielded generator varies only in that the elements of each generator have a particular remainder when divided by `m`. What does that tell you about the argument(s) that the inner function should take in?
+>
+> Note that if you have implemented this correctly, each of the generators yielded by `remainder_generator` will be *infinite* - you can keep calling `next` on them forever without running into a `StopIteration` exception.
+
+Note that a function containing a `yield from` statement is also a generator function. I used built-in `filter` and `map` function in this question, and each of them returns an iterable object.
+
++++++
+
+[Q2 Generators generator](https://inst.eecs.berkeley.edu/~cs61a/su20/lab/lab08/#q2) from `lab08.py`:
+
+> Write the generator function `make_generators_generator`, which takes a zero-argument generator function `g` and returns a generator that yields generators.  For each element `e` yielded by the generator object returned by calling `g`, a new generator object is yielded that will generate entries 1 through `e` yielded by the generator returned by `g`.
+
+Note that this question is another "higher-order generator" problem.
+
++++++
+
+[Q8 The Professor Arrives]("Tesla Model S goes vroom!") from `lab08.py`:
+
+>A new challenger has appeared! Implement the `effect` method for the Professor, who adds the opponent card's attack and defense to all cards in the player's deck and then removes *all* cards in the opponent's deck that have the same attack or defense as the opponent's card.
+>
+>> *Note:* You might run into trouble when you mutate a list as you're iterating through it. Try iterating through a copy instead! You can use slicing to copy a list:
+>>
+>> ```
+>>   >>> lst = [1, 2, 3, 4]
+>>   >>> copy = lst[:]
+>>   >>> copy
+>>   [1, 2, 3, 4]
+>>   >>> copy is lst
+>>   False
+>> ```
+
+Another way to avoid iterate through a size-changing container(iterable) is this:
+
+````python
+cnt = 0
+while cnt != len(container):
+    if <condition to change size>:
+        # change size of container
+    else:
+        cnt += 1
+````
+
++++++
+
+[Q6 Yield Paths](https://inst.eecs.berkeley.edu/~cs61a/su20/hw/hw06/#q6) from`hw06.py`:
+
+> Define a generator function `path_yielder` which takes in a Tree `t`, a value `value`, and returns a generator object which yields each path from the root of `t` to a node that has label `value`.
+>
+> `t` is implemented with a class, not as the function-based ADT.
+>
+> Each path should be represented as a list of the labels along that path in the tree. You may yield the paths in any order.
+>
+> We have provided a (partial) skeleton for you. You do not need to use this skeleton, but if your implementation diverges significantly from it, you might want to think about how you can get it to fit the skeleton.
+
+The implementation below will cause an GeneratorExit exception when nested (generator)function `dfs` is called:
+
+````python
+def path_yielder(t, value):
+    "*** YOUR CODE HERE ***"
+    paths = []
+    def dfs(t, path):
+        path.append(t.label)
+        if t.label == value:
+            lst = path[:]
+            yield lst # This line makes dfs a generator function
+            #paths.append(path[:])
+        for b in t.branches:
+            dfs(b, path)
+        path.pop()
+    dfs(t, [])
+    #yield from paths
+````
+
+One of the correct version is to delete the `yield lst` line, and then add the comment lines.
+
+And here is [a more elegant implementation](https://github.com/PKUFlyingPig/CS61A/blob/master/hws/hw06/hw06.py):
+
+```python
+def path_yielder(t, value):
+    "*** YOUR CODE HERE ***"
+    if t.label == value:
+        yield [value]
+    for b in branches:
+        for path in path_yielder(b, value):
+            yield [t.label] + path
+```
 
