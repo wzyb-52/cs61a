@@ -1076,7 +1076,7 @@ Note that a function containing a `yield from` statement is also a generator fun
 
 +++++
 
-[Q2 Generators generator](https://inst.eecs.berkeley.edu/~cs61a/su20/lab/lab08/#q2) from `lab08.py`:
+[Q2 Generators generator](https://inst.eecs.berkeley.edu/~cs61a/su20/lab/lab08/#q2) from `lab08.py` ---- higher-order generator:
 
 > Write the generator function `make_generators_generator`, which takes a zero-argument generator function `g` and returns a generator that yields generators.  For each element `e` yielded by the generator object returned by calling `g`, a new generator object is yielded that will generate entries 1 through `e` yielded by the generator returned by `g`.
 
@@ -1084,7 +1084,7 @@ Note that this question is another "higher-order generator" problem.
 
 +++++
 
-[Q8 The Professor Arrives]("Tesla Model S goes vroom!") from `lab08.py`:
+[Q8 The Professor Arrives](https://inst.eecs.berkeley.edu/~cs61a/su20/lab/lab08/#q8) from `classes.py` of lab08 ---- iterating through a size-changing container(iterable):
 
 >A new challenger has appeared! Implement the `effect` method for the Professor, who adds the opponent card's attack and defense to all cards in the player's deck and then removes *all* cards in the opponent's deck that have the same attack or defense as the opponent's card.
 >
@@ -1099,7 +1099,7 @@ Note that this question is another "higher-order generator" problem.
 >>   False
 >> ```
 
-Another way to avoid iterate through a size-changing container(iterable) is this:
+Another way to avoid **iterating through a size-changing container(iterable)** is this:
 
 ````python
 cnt = 0
@@ -1112,7 +1112,7 @@ while cnt != len(container):
 
 +++++
 
-[Q6 Yield Paths](https://inst.eecs.berkeley.edu/~cs61a/su20/hw/hw06/#q6) from`hw06.py`:
+[Q6 Yield Paths](https://inst.eecs.berkeley.edu/~cs61a/su20/hw/hw06/#q6) from`hw06.py` ---- GeneratorExit exception:
 
 > Define a generator function `path_yielder` which takes in a Tree `t`, a value `value`, and returns a generator object which yields each path from the root of `t` to a node that has label `value`.
 >
@@ -1122,7 +1122,7 @@ while cnt != len(container):
 >
 > We have provided a (partial) skeleton for you. You do not need to use this skeleton, but if your implementation diverges significantly from it, you might want to think about how you can get it to fit the skeleton.
 
-The implementation below will cause an GeneratorExit exception when nested (generator)function `dfs` is called:
+The implementation below will cause an **GeneratorExit exception** when nested (generator)function `dfs` is called:
 
 ````python
 def path_yielder(t, value):
@@ -1155,3 +1155,152 @@ def path_yielder(t, value):
             yield [t.label] + path
 ```
 
++++++
+
+[P5](https://inst.eecs.berkeley.edu/~cs61a/su20/proj/ants/#problem-5-3-pt) from `ants.py` ---- iterating over a size-changing list & copying an container like a list:
+
+> *Hint:* Damaging a bee may cause it to be removed from its place. If you iterate over a list, but change the contents of that list at the same time, you [may not visit all the elements](https://docs.python.org/3/tutorial/controlflow.html#for-statements). This can be prevented by making a copy of the list. You can either use a list slice, or use the built-in `list` function.
+>
+> ```python
+>  >>> lst = [1,2,3,4]
+>  >>> lst[:]
+>  [1, 2, 3, 4]
+>  >>> list(lst)
+>  [1, 2, 3, 4]
+>  >>> lst[:] is not lst and list(lst) is not lst
+>  True
+> ```
+
+However, in these question, even the poor implementation of iterating through a size-changing list will pass all tests, so be careful to write robust codes.
+
+> Poor examples:
+>
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120230506103.png" alt="image-20230120230506103" style="zoom:80%;" />
+>
+> And it passed all tests!
+>
+> I think there is also some problems within [this implementation](https://github.com/PKUFlyingPig/CS61A/blob/d10e4ad562614942fc3e5069b3a88f8cd7bd694f/projects/ants/ants.py#L242):
+>
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120230705475.png" alt="image-20230120230705475" style="zoom:80%;" />
+>
+> since it changes the size of the copy while iterating over it too.
+
+And for more straight understanding of **iterating over a size-changing list** and the underlying mechanism of **copying an container like a list**, use Python Tutor!
+
+> ```python
+> >>> lst = [[1, 2], 3, 4]
+> >>> a = lst[:]
+> >>> b = list(lst)
+> >>> c = lst.copy()
+> >>> a is lst
+> False
+> >>> b is lst
+> False
+> >>> c is lst
+> False
+> >>> a[0] is lst[0]
+> True
+> >>> b[0] is lst[0]
+> True
+> >>> c[0] is lst[0]
+> True
+> ```
+>
+> Above codes show that **the elements of list are assigned via assignment statement no matter which copy method(slice, built-in `list`, or method attribute `copy`) is used.** So according to the mechanism of assignment statement, all the elements in the newly copy-created list is the name **binded to the same value**.
+>
+> However, when try to remove all the elements in `lst`:
+>
+> ```python
+> >>> for i in c:
+> ...     lst.remove(i)
+> ... 
+> >>> lst
+> []
+> >>> a
+> [[1, 2], 3, 4]
+> >>> c
+> [[1, 2], 3, 4]
+> >>> b
+> [[1, 2], 3, 4]
+> ```
+>
+> only `lst` changed, and we can figure it out by visualizing the code in Python Tutor:
+>
+> ```python
+> lst = [[1, 2], 3, 4]
+> a = lst.copy()
+> for _ in a:
+>     lst.remove(_)
+> ```
+>
+> > The first elements of both list bind to the same list.
+> >
+> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232042347.png" alt="image-20230120232042347" style="zoom:80%;" />
+> >
+> > But after `remove`, only element in `lst` was removed, and actually only the name and the binding relation were removed:
+> >
+> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232333420.png" alt="image-20230120232333420" style="zoom:80%;" />
+> >
+> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232346046.png" alt="image-20230120232346046" style="zoom:80%;" />
+>
+> **So we can see that the mechanism of `remove` is similar to "smart pointer" in C++ and the memory management of Java.**
+>
+> Back to the size-changing iterable problem:
+>
+> ```python
+> lst = [[1, 2], 3, 4]
+> a = lst.copy()
+> for _ in lst:
+>     lst.remove(_)
+> ```
+>
+> > The _ first refers to `[1, 2]`:
+> >
+> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232731439.png" alt="image-20230120232731439" style="zoom:80%;" />
+> >
+> > but after the size of container had changed, **the iterator skipped over `3` and referred to `4`**.
+> >
+> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232943226.png" alt="image-20230120232943226" style="zoom:80%;" />
+> >
+> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232959858.png" alt="image-20230120232959858" style="zoom:80%;" />
+
+In conclusion,
+
++ the mechanism of `remove` is similar to "smart pointer" in C++ and the memory management of Java.
++ the elements of list are assigned via assignment statement no matter which copy method(slice, built-in `list`, or method attribute `copy`) is used. So according to the mechanism of assignment statement, all the elements in the newly copy-created list is the name binded to the same value.
++ the iterator will skip over some element and even cause exception after the size of container changed.
+
+Back to this problem, how to write a safe and robust code?
+
++ First use our older way of accessing element with index instead of iterator:
+
+  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120235057766.png" alt="image-20230120235057766" style="zoom:80%;" />
+
++ Or we can modify some [one line of this version](https://github.com/PKUFlyingPig/CS61A/blob/d10e4ad562614942fc3e5069b3a88f8cd7bd694f/projects/ants/ants.py#L242):
+
+  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120230705475.png" alt="image-20230120230705475" style="zoom:80%;" />
+  >
+  > ```python
+  > class FireAnt(Ant):
+  >     ...
+  >     def reduce_armor(selff, amount):
+  >         ...
+  >         # BEGIN Problem 5
+  >         "*** YOUR CODE HERE ***"
+  >         def reflected_damage(amount):
+  >             remaining_bees = []
+  >             for bee in self.place.bees:
+  >                 if bee.armor > amount:
+  >                     remaining_bees.append(bee)
+  >             for bee in remaining_bees: # This line has been modified!
+  >                 Insect.reduce_armor(bee, amount)
+  >             self.place.bees = remaining_bees
+  >         reflected_damage(amount)
+  >         ...
+  >         # END Problem 5
+
+  
+
+  
+
+  
