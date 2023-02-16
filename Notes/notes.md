@@ -850,6 +850,348 @@ Nothing more is interesting.
 
 ## Chapter 3: Interpreting Computer Programs
 
+### 3.1 Introduction
+
+Instead of functions and data, this chapter focuses on the third fundamental element of programming: programs themselves. The prospect of this chapter is to study the design of interpreters and the computational processes that they created when executing programs.
+
+And **[Scheme](https://en.wikipedia.org/wiki/Scheme_(programming_language))** will be introduced as a powerful language with a minimal set of features, which do not include an object system, higher-order functions, assignment, or even control constructs such as `while` and `for`.
+
+Though interpreters are programs that can carry out many possible computation, making it seem to be very hard to take all conditions into consideration, many interpreters have an elegant common structure: two mutually recursive functions. **The first evaluates expressions in environment; the second applies functions to argument**s. Applying a function requires evaluating the expressions in its body, while evaluating an expression may involve applying one or more functions.
+
+### 3.2 Functional programming
+
+Before we start this section, I strongly suggest reading [this article](https://realpython.com/python-functional-programming/) first.
+
+The features of functional programming:
+
++ All functions are **pure functions**.
++ **No re-assignment** and **no mutable data types**.
++ Name-value bindings are permanent.
+
+The advantages of functional programming:
+
++ High level: You're describing the result you want rather than explicitly specifying the steps required to get there.
++ Transparent: The behavior of a pure function depends only on its inputs and outputs, without intermediary values. That eliminates the possibility of side effects, which facilitates debugging.
++ Parallelizable: Routines that don't cause side effects can more easily run in parallel with one another, so do the subexpressions of an evaluated expression.
+
++++++
+
+Scheme programs consist of expressions, such as
+
++ primitive expressions. Numbers are self-evaluating; symbols(not all are primitive) are bound to values.
+
+  > `2, 3.3, true, +, quotient`
+
++ combinations.
+
+  + Call  expressions include an operator and 0 or more operands in parentheses.
+
+    > `(quotient 10 2)`.
+
+    And an operator can be(I think it should be "include" here) a call expression too:
+
+    > `((lambda (x y z) (+ x y (square z))) 1 2 3)`.
+
+  + A combination that is not a call expression is a *special* form.
+
+    + **If** expression: `(if <predicate> <consequent> <alternative>)`.
+    + **And** and **or**: `(and <e1> ... <en>)`, `<or <e1> ... <en>>`.
+    + Binding symbols: `(define <symbol> <expression>)`.
+    + New procedures: `(define (<symbol> <formal parameters>) <body>)`.
+
+    > Here is a implementation of a procedure calculating the sqrt root of a number:
+    >
+    > ```scheme
+    > (define (sqrt x)
+    > (define (update guess)
+    >  (if (= (square guess) x)
+    >      guess
+    >      (update (average guess (/ x guess)))))
+    > (update 1))
+    > ```
+    >
+    > Remember that **Scheme will automatically return the last clause in your procedure**. And **`define` procedure expression can't be returned**.
+
+    + **Lambda expression** evaluate to anonymous procedures: `(lambda (<formal-parameters>) <body>)`.
+    
+      For example, there are two equivalent expressions: `(define (plus4 x) (+ x 4))` and `(define plus4 (lambda (x) (+ x 4)))`.
+      
+    + Macros provide a way to define new special forms.
+
++++++
+
+Scheme lists are like the `Link` class in previous text. And this data structure could represent combinations. **All the codes in Scheme are just lists**.
+
++ `cons`: Two-argument procedure that creates a linked list.
++ `car`: Procedure that returns the first element of a list.
++ `cdr`: Procedure that returns the rest of a list.
++ `nil`: The empty list.
+
+The Scheme code represented by list can be evaluated through `eval()`:
+
+````scheme
+scm> (eval (list 'quotient 10 2))
+5
+````
+
+This line of code equals to evaluating `(quotient 10 2)`.
+
+In such language, **it is straightforward to write a program that writes a program**.
+
++++++
+
+Something interesting with symbolic programming in Scheme:
+
++ Evaluating a quote expression gets the unevaluated-expression itself.
+
+  > ````scheme
+  > scm> (list 1 'a)
+  > (1 a)
+  > ````
+
++ And in the above instance, even `a` is a symbol that has not been identified yet, evaluating the expression `(list 1 'a)` doesn't cause an error since `a` is not evaluated. But if you try to evaluate `a`, an `unknown identifier` will be raised.
+
++ `,` is used to unquote a expression with quasi quote(`).
+
+  > ```scheme
+  > scm> (define b 2)
+  > scm> `(a ,b c)
+  > (a 2 c)
+  > ```
+
+
++++++
+
+A programing language has:
+
++ **Syntax**: the **form** of the language ---- the legal statements and expressions in the language.
++ **Semantics**: the **meaning** of the language ---- the execution/evaluation rule for those statements and expressions.
+
+To create a new programming language, you either need a:
+
++ **Specification**: a document describe the precise syntax and semantics of the language.
++ **Canonical Implementation**: an interpreter or compiler for the language.
+
+### 3.5 Interpreters for languages with abstraction
+
+ A parser takes text and returns an expression. There are tho specific steps in the process of parsing.
+
++ **Lexical analysis**: the **iterative** process that checks for malformed tokens, determines types of tokens. One line at a time. **Checks and picks every single token up**.
+
++ **Syntactic analysis**: the **tree-recursive** process that balances parentheses, returns tree structure. Multiple lines at a time. **Identifies the hierarchical structure of an (nested) expression**.
+
+  > For non-base cases, scheme **read sub-expressions and combine them as a whole**.
+
+**Predictive recursive descent parsers** deal with recursive syntactic analysis. A predictive recursive descent parser inspects only `k` tokens to decide how to proceed for some fixed `k`. It means the parser needs only `k` tokens to know the structure of expression.
+
+> English can't be parsed via predictive recursive descent, since the head of a sentence may be a subject consisting of many words, causing a misunderstanding if you only inspect first k words.
+>
+> ```English
+> The horse raced past the barn fell.
+> ```
+
++++++
+
+The mutually recursive calls of `eval` and `apply`:
+
+> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230129001640763.png" alt="image-20230129001640763" style="zoom:80%;" />
+>
+> Note that:
+>
+> + Why recursively `Eval()` calling exists? Because the sub-expression of the evaluated expression needs to be evaluated.
+> + Why `Eval()` sometimes calls `Apply()`? Because the evaluated expression is a procedure(to be more exact, the expression evaluates to a procedure "value"), and the the interpreter calls `apply()` on the procedure to obtain the value.
+> + Why `apply()` sometimes calls `Eval()`? Because the body of self-defined procedure(lambda procedure) is another expression to be evaluated.
+>
+> **In conclusion, `Eval()` and `Apply()` may recursively mutually call each other, due to the actual expression**.
+
+And the environment mechanism of Scheme is similar to Python's.
+
++++++
+
+Lambda expression evaluate to **all user-defined procedures**(since define a procedure is equivalent to define a lambda expression in Scheme).
+
+```scheme
+(lambda (<formal-parameters>) <body>)
+```
+
+A pseudo code of a lambda expression implementation of lambda procedure is:
+
+> ```python
+> class LambdaProcedure:
+>     def __init__(self, formals, body, env):
+>         self.formals = formals
+>         self.body = body
+>         self.env = env
+> ```
+>
+> + `formals`: a scheme list of symbols, meaning the passed formal parameters.
+>
+> + `body`: a scheme expression, meaning the called, evaluated, and applied procedures.
+>
+> + `env`: a frame **instance** of the environment where the lambda procedure is defined.
+>
+>   > Frames are Python instances with methods **lookup** and **define**.
+
++++++
+
+Define binds a symbol to a value in the first frame of the current environment.
+
+```scheme
+(define <name> <expression>)
+```
+
+Steps are:
+
++ Evaluate the `<expression>`.
++ Bind `<name>` to its value in the current frame.
+
+Procedure definition is shorthand of define with a lambda expression. And below two expression are completely equivalent.
+
+```scheme
+(define (<name> <formal parameters>) <body>)
+(define <name> (lambda (<formal parameters>) <body>))
+```
+
++++++
+
+The way in which names are looked up are called:
+
++ **Lexical scope**: The parent of a frame is the environment in which a procedure is **defined**. Also called Statical scope.
+
+  > In most language including C, C++, Java, Python, and Scheme, variables are statically (or lexically) scoped. Some interesting discussions are [here](https://stackoverflow.com/questions/51604346/does-python-scoping-rule-fits-the-definition-of-lexical-scoping).
+
++ **Dynamic scope**: The parent of a frame is the environment in which a procedure is **called**.
+
+And I think it's helpful to demonstrate an example here:
+
+> ```scheme
+> (define f (lambda (x) (+ x y)))
+> (define g (lambda (x y) (f (+ x x))))
+> (g 3 7)
+> ```
+>
+> In lexical scope, an "unknown identifier: y" error will be raised, since there is no such name as "y" in the environment where `f` is defined.
+>
+> And in dynamic scope, `(g 3 7)` will be evaluated to 13.
+
++++++
+
+Given the features and advantages of functional programming, we can deduce that there is no for/while statements in functional programming, since re-assignment and mutable data types are forbidden.
+
+To make the basic iteration efficient (only costs O(1) space in most normal situations), we use the technique called **tail recursion**.
+
+First we introduce **tail call**:
+
++ Definition:
+
+  If there isn't other computation besides just return the value of the called expression, then this is a tail call. In other word, a call expression is not a tail call if more computation is still required in the calling procedure.
+
+  A tail call is a call expression in a **tail context**, and a tail context is:
+
+  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230208234847062.png" alt="image-20230208234847062" style="zoom:80%;" />
+
++ Example: `map` implementation with only a constant number of frames.
+
+  > Normal implementation is:
+  >
+  > ```scheme
+  > (define (map procedure s)
+  >   (if (null? s)
+  >          nil
+  >          (cons (procedure (car s))
+  >                (map procedure (cdr s)))))
+  > ```
+  >
+  > However, we can see that the expression in line 4 and 5 is a tail context and a tail call to `cons`, but not a tail call to `map`.
+  >
+  > So one of tail-call implementation is:
+  >
+  > ````scheme
+  > (define (map procedure s)
+  >      (define (map-reverse s m)
+  >        (if (null? s)
+  >            m
+  >            (map-reverse (cdr s)
+  >                         (cons (procedure (car s) m)))))
+  >      (reverse (map-reverse s nil)))
+  >   ````
+  > 
+  >Note that this is a tail call to reverse, so we must ensure the `reverse` recursive procedure runs in constant space. So `reverse` should be a tail recursive too:
+  > 
+  >````scheme
+  > (define (reverse s)
+  > (define (reverse-iter s r)
+  >    (if (null? s)
+  >         r
+  >         (reverse-iter (cdr s)
+  >                       (cons (car s) r))))
+  >    (reverse-iter s nil))
+  >   ````
+
++++++
+
+A macro is an operation performed on the **source code** of a program **before evaluation**. Macros exist in many languages, but are easiest to define correctly in a language like Lisp. Scheme has a **define-macro** special form that defines a source code transformation.
+
+Evaluation procedure of a macro call expression:
+
++ Evaluate the **operator** sub-expression, which evaluates to a **macro**(since this is a macro call expression).
+
++ Call the macro procedure on the **operand** expressions ***without evaluating them first***.
+
+  > For example,
+  >
+  > ```scheme
+  > (define-macro (twice expr)
+  >               (list 'begin expr expr))
+  > ```
+  >
+  > and if we execute the Scheme interpreter:
+  >
+  > ````scheme
+  > scm> (twice (print 2))
+  > 2
+  > 2
+  > ````
+  >
+  > Here we know only the operand `expr`, which is actually the `print 2` expression, is not evaluated when the macro procedure is called. In contrast, `'begin` in the `(list 'begin expr expr)` is evaluated.
+  >
+  > I think this is the key part of writing a macro.
+
+  > Besides, the idea of macro can be implemented without `define-macro`:
+  >
+  > ````scheme
+  > (define (twice expr)
+  >   (list 'begin expr expr))
+  > ````
+  >
+  > ```scheme
+  > scm> (eval (twice '(print 2)))
+  > 2
+  > 2
+  > ```
+  >
+  > Here the operand is ensured to not be evaluated when `twice` is called by `'`, and the list returned by the `twice` procedure is then evaluated.
+
++ Evaluate the expression returned from the macro procedure.
+
+Now we use macro to define `for` statement of scheme. The actual evaluated expression of `(for sym vals expr)` is `(map (lambda (sym) expr) vals)`. Here `expr` is the body expression, and `vals` is the list of values to be iterate over.
+
++ First version:
+
+  ````scheme
+  (define-macro (for sym vals expr)
+                (list 'map (list 'lambda (list sym) expr) vals))
+  ````
+
++ Second version with quasi quote.
+
+  ```scheme
+  (define-macro (for sym vals expr)
+                `(map (lambda (,sym) ,expr) ,vals))
+  ```
+
+  The key is that we **unquote on the beginning of all the operand expression**.
+
 
 
 ## Chapter 4: Data Processing
@@ -937,6 +1279,47 @@ Generators & Iterators.
   > `````
   >
   > Note that countdown is a generator function and creates a generator, so it is legal to `yield from` a generator created by `countdown`.
+
++++++
+
+From the context we know that python has sequence manipulation with O(1) space cost via iterator, and in Scheme, **steams** provide the similar way to manipulate sequences in constant space. The actual mechanism of these tricks is **lazily computation**.
+
+The built-in operators on streams: `car`, `cons-stream`, `cdr-stream`.
+
+A stream can give on-demand access to each element in order.
+
+Some regular tricks with streams constructing and processing:
+
++ An integer stream:
+
+  ````scheme
+  (define (int-stream start)
+    (cons-stream start (int-stream (+ start 1))))
+  ````
+
++ An infinite stream of 1:
+
+  ````scheme
+  (define ones (cons-stream 1 ones))
+  ````
+
++ Recursively defined streams:
+
+  ````scheme
+  (define (add-steams s t)
+    (cons-stream (+ (car s) (car t))
+                 (add-steams (cdr s) (cdr t))))
+  ````
+
+  Then the integer stream could be defined as:
+
+  ````scheme
+  (define ints (cons-stream 1 (add-streams ones ints)))
+  ````
+
+### 4.3 Declarative  Programming
+
+
 
 
 
@@ -1227,10 +1610,11 @@ And for more straight understanding of **iterating over a size-changing list** a
 > only `lst` changed, and we can figure it out by visualizing the code in Python Tutor:
 >
 > ```python
+> 
 > lst = [[1, 2], 3, 4]
 > a = lst.copy()
 > for _ in a:
->     lst.remove(_)
+>  lst.remove(_)
 > ```
 >
 > > The first elements of both list bind to the same list.
@@ -1276,7 +1660,7 @@ Back to this problem, how to write a safe and robust code?
 
   > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120235057766.png" alt="image-20230120235057766" style="zoom:80%;" />
 
-+ Or we can modify some [one line of this version](https://github.com/PKUFlyingPig/CS61A/blob/d10e4ad562614942fc3e5069b3a88f8cd7bd694f/projects/ants/ants.py#L242):
++ Or we can modify one line of [this version](https://github.com/PKUFlyingPig/CS61A/blob/d10e4ad562614942fc3e5069b3a88f8cd7bd694f/projects/ants/ants.py#L242):
 
   > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120230705475.png" alt="image-20230120230705475" style="zoom:80%;" />
   >
@@ -1299,8 +1683,153 @@ Back to this problem, how to write a safe and robust code?
   >         ...
   >         # END Problem 5
 
-  
 
-  
++++++
 
-  
+[Q4 Make adder](https://inst.eecs.berkeley.edu/~cs61a/su20/lab/lab10/#q4) from `lab10.scm`:
+
+> Write the procedure `make-adder` which takes in an initial number, `num`, and then returns a procedure. This returned procedure takes in a number `inc` and returns the result of `num + inc`.
+>
+> *Hint*: To return a procedure, you can either return a `lambda` expression or `define` another nested procedure. Remember that Scheme will automatically return the last clause in your procedure.
+
+Code below:
+
+````scheme
+(define (make-adder num)
+;  (lambda (x) (+ x num))
+	(define (add x)
+		(+ num x))
+	add
+)
+````
+
+Remember that Scheme will automatically return the last clause in your procedure. And `define` procedure expression can't be returned, so `add` in line 5 is necessary while `lambda` expression will be returned. 
+
++++++
+
+[Q8 List Comprehension](https://inst.eecs.berkeley.edu/~cs61a/su20/hw/hw07/#q8) from `hw07`:
+
+> Recall that list comprehensions in Python allow us to create lists out of iterables:
+>
+> ```python
+> [<map-expression> for <name> in <iterable> if <conditional-expression>]
+> ```
+>
+> Use a macro to implement list comprehensions in Scheme that can create lists out of lists. Specifically, we want a `list-of` macro that can be called as follows:
+>
+> ```scheme
+> (list-of <map-expression> for <name> in <list> if <conditional-expression>)
+> ```
+>
+> Calling `list-of` will return a new list constructed by doing the following for each element in `<list>`:
+>
+> - Bind `<name>` to the element.
+> - If `<conditional-expression>` evaluates to a truth-y value, evaluate  `<map-expression>` and add it to the result list.
+>
+> Here are some examples:
+>
+> ```scheme
+> scm> (list-of (* x x) for x in '(3 4 5) if (odd? x))
+> (9 25)
+> scm> (list-of 'hi for x in '(1 2 3 4 5 6) if (= (modulo x 3) 0))
+> (hi hi)
+> scm> (list-of (car e) for e in '((10) 11 (12) 13 (14 15)) if (list? e))
+> (10 12 14)
+> ```
+>
+> > *Hint:* You may use the built-in `map` and `filter` procedures. Check out the [Scheme Built-ins](https://inst.eecs.berkeley.edu/~cs61a/su20/articles/scheme-builtins.html) reference for more information.
+> >
+> > You may find it helpful to refer to the `for` loop macro introduced in lecture. The filter expression should be transformed using a `lambda` in a similar way to the map expression in the example.
+
+This is an interesting supplementary exercises for macro, which gives many ideas about writing some fancy codes with Scheme.
+
++++++
+
+[Q6: Partial sums](https://inst.eecs.berkeley.edu/~cs61a/su20/lab/lab12/#q6) from `lab12`:
+
+> Define a function `partial-sums`, which takes in a stream with elements
+>
+> ```
+> a1, a2, a3, ...
+> ```
+>
+> and outputs the stream
+>
+> ```
+> a1, a1 + a2, a1 + a2 + a3, ...
+> ```
+>
+> If the input is a finite stream of length *n*, the output should be a finite stream of length *n*. If the input is an infinite stream, the output should also be an infinite stream.
+
+If do not consider the space cost, this version satisfy the demand:
+
+````scheme
+(define (partial-sums stream)
+  (define (helper start s)
+      (if (null? s) nil
+          (cons-stream (+ start (car s)) (helper (+ start (car s)) (cdr-stream s)))))
+  (helper 0 stream)
+)
+````
+
+Otherwise a tail-recursive version should be implemented. However, **below version is not qualified** since an infinite stream will never touch the stopping condition. So this is just another try for tail recursion:smile:.
+
+````scheme
+(define (partial-sums stream)
+  (define (helper start s m)
+      (if (null? s) m
+          (helper (+ start (car s))
+                  (cdr-stream s)
+                  (cons-stream (+ start (car s)) m))))
+  (helper 0 stream nil)
+)
+````
+
++++++
+
+[Problem 17](https://inst.eecs.berkeley.edu/~cs61a/su20/proj/scheme/#problem-17-2-pt) from `scheme.py`:
+
+> Implement the `list-change` procedure, which lists all of the ways to make change for a positive integer `total` amount of money, using a list of currency denominations, which is sorted in descending order. The resulting list of ways of making change should also be returned in descending order.
+>
+> To make change for 10 with the denominations (25, 10, 5, 1), we get the possibilities:
+>
+> ```
+> 10
+> 5, 5
+> 5, 1, 1, 1, 1, 1
+> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+> ```
+>
+> To make change for 5 with the denominations (4, 3, 2, 1), we get the possibilities:
+>
+> ```
+> 4, 1
+> 3, 2
+> 3, 1, 1
+> 2, 2, 1
+> 2, 1, 1, 1
+> 1, 1, 1, 1, 1
+> ```
+>
+> You may find that implementing a helper function, `cons-all`, will be useful for this problem. To implement `cons-all`, use the [built-in map procedure](https://inst.eecs.berkeley.edu/~cs61a/su20/articles/scheme-builtins.html#map). `cons-all` takes in an element `first` and a list of lists `rests`, and adds `first` to the beginning of each list in `rests`:
+>
+> ```scheme
+> scm> (cons-all 1 '((2 3) (2 4) (3 5)))
+> ((1 2 3) (1 2 4) (1 3 5))
+> ```
+
+Note the difference and condition of (1) `(cons nil nil)` and (2) `nil`.
+
+````scheme
+(define (cons-all first rests)
+  (map (lambda (rest) (cons first rest)) rests))
+
+(define (list-change total denoms)
+  (if (<= total 0) (cons nil nil)	;(1)
+      (if (null? denoms) nil		;(2)
+          (if (< total (car denoms))
+              (list-change total (cdr denoms))
+              (append (cons-all (car denoms) (list-change (- total (car denoms)) denoms))
+                      (list-change total (cdr denoms))))))
+  )
+````
