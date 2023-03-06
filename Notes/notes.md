@@ -475,12 +475,12 @@ t = [5, 6]
 
 |                          Operation                           |                        Example                        |                           Results                            |
 | :----------------------------------------------------------: | :---------------------------------------------------: | :----------------------------------------------------------: |
-|          **append**:<br> adds one element to a list          |                 s.append(t)<br>t = 0                  | <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230101192230682.png" alt="image-20230101192230682" style="zoom:80%;" /> |
-| **extend**:<br> adds all elements in one list to another list |               s.extend(t)<br/>t[1] = 0                | <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230101192724848.png" alt="image-20230101192724848" style="zoom:80%;" /> |
-| addition & slicing:<br>create new lists **containing existing elements** | a = s + [t]<br>b = a[1:]<br>a[1] = 9<br>b\[1]\[1] = 0 | <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230101193620579.png" alt="image-20230101193620579" style="zoom:80%;" /> |
-| The list function:<br> creates a new list which contains new elements |                t = list(s)<br>s[1] = 0                | <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230101194354563.png" alt="image-20230101194354563" style="zoom:80%;" /> |
+|          **append**:<br> adds one element to a list          |                 s.append(t)<br>t = 0                  | <img src="images/image-20230101192230682.png" alt="image-20230101192230682" style="zoom:80%;" /> |
+| **extend**:<br> adds all elements in one list to another list |               s.extend(t)<br/>t[1] = 0                | <img src="images/image-20230101192724848.png" alt="image-20230101192724848" style="zoom:80%;" /> |
+| addition & slicing:<br>create new lists **containing existing elements** | a = s + [t]<br>b = a[1:]<br>a[1] = 9<br>b\[1]\[1] = 0 | <img src="images/image-20230101193620579.png" alt="image-20230101193620579" style="zoom:80%;" /> |
+| The list function:<br> creates a new list which contains new elements |                t = list(s)<br>s[1] = 0                | <img src="images/image-20230101194354563.png" alt="image-20230101194354563" style="zoom:80%;" /> |
 |    slice assignment:<br>replaces a slice with new values     |          s[0:0] = t<br>s[3:] = t<br>t[1] = 0          | ![image-20230101194619805](/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230101194619805.png) |
-|                       complex example                        |     t = [1, 2, 3]<br>t[1:3] = [t]<br>t.extend(t)      | <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230101194934406.png" alt="image-20230101194934406" style="zoom:80%;" /> |
+|                       complex example                        |     t = [1, 2, 3]<br>t[1:3] = [t]<br>t.extend(t)      | <img src="images/image-20230101194934406.png" alt="image-20230101194934406" style="zoom:80%;" /> |
 
 ++++
 
@@ -695,11 +695,11 @@ Assignment to attributes has the following rules:
 
 Practice 1:
 
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230113202912929.png" alt="image-20230113202912929" style="zoom:80%;" />
+> <img src="images/image-20230113202912929.png" alt="image-20230113202912929" style="zoom:80%;" />
 >
 > Draw the diagram:
 >
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230113203005325.png" alt="image-20230113203005325" style="zoom:80%;" />
+> <img src="images/image-20230113203005325.png" alt="image-20230113203005325" style="zoom:80%;" />
 >
 > Note:
 >
@@ -708,7 +708,7 @@ Practice 1:
 >
 > The answer is:
 >
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230113203133197.png" alt="image-20230113203133197" style="zoom:80%;" />
+> <img src="images/image-20230113203133197.png" alt="image-20230113203133197" style="zoom:80%;" />
 >
 > Errata:
 >
@@ -719,15 +719,15 @@ Practice 1:
 
 Practice 2:
 
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230114111227268.png" alt="image-20230114111227268" style="zoom:80%;" />
+> <img src="images/image-20230114111227268.png" alt="image-20230114111227268" style="zoom:80%;" />
 >
 > The diagram is:
 >
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230114111306501.png" alt="image-20230114111306501" style="zoom:80%;" />
+> <img src="images/image-20230114111306501.png" alt="image-20230114111306501" style="zoom:80%;" />
 >
 > The answer is:
 >
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230114111338432.png" alt="image-20230114111338432" style="zoom:80%;" />
+> <img src="images/image-20230114111338432.png" alt="image-20230114111338432" style="zoom:80%;" />
 
 +++++
 
@@ -788,21 +788,21 @@ Polymorphic function: A function that applies to many(poly) different forms(morp
 >
 > + NO instance attribute:
 >
->   <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117003843702.png" alt="image-20230117003843702" style="zoom:80%;" />
+>   <img src="images/image-20230117003843702.png" alt="image-20230117003843702" style="zoom:80%;" />
 >
 > + WITH instance attribute:
 >
->   <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117004143740.png" alt="image-20230117004143740" style="zoom:80%;" />
+>   <img src="images/image-20230117004143740.png" alt="image-20230117004143740" style="zoom:80%;" />
 
 Special method names
 
 + They start and end with two underscores and have built-in behavior.
 
-  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117002842666.png" alt="image-20230117002842666" style="zoom:80%;" />
+  > <img src="images/image-20230117002842666.png" alt="image-20230117002842666" style="zoom:80%;" />
 
 + And the behavior of calling some built-in function equals to using the corresponding special methods:
 
-  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117003112766.png" alt="image-20230117003112766" style="zoom:80%;" />
+  > <img src="images/image-20230117003112766.png" alt="image-20230117003112766" style="zoom:80%;" />
 
   This enables Python to have a great extensibility to write more interfaces like `str()` and `repr()`.
 
@@ -814,7 +814,7 @@ Modular design:
 
 Take Hog and Ants projects as examples:
 
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230117001521341.png" alt="image-20230117001521341" style="zoom:80%;" />
+> <img src="images/image-20230117001521341.png" alt="image-20230117001521341" style="zoom:80%;" />
 
 ### 2.9 Recursive objects
 
@@ -994,7 +994,7 @@ To create a new programming language, you either need a:
 
 The mutually recursive calls of `eval` and `apply`:
 
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230129001640763.png" alt="image-20230129001640763" style="zoom:80%;" />
+> <img src="images/image-20230129001640763.png" alt="image-20230129001640763" style="zoom:80%;" />
 >
 > Note that:
 >
@@ -1088,7 +1088,7 @@ First we introduce **tail call**:
 
   A tail call is a call expression in a **tail context**, and a tail context is:
 
-  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230208234847062.png" alt="image-20230208234847062" style="zoom:80%;" />
+  > <img src="images/image-20230208234847062.png" alt="image-20230208234847062" style="zoom:80%;" />
 
 + Example: `map` implementation with only a constant number of frames.
 
@@ -1558,13 +1558,13 @@ However, in these question, even the poor implementation of iterating through a 
 
 > Poor examples:
 >
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120230506103.png" alt="image-20230120230506103" style="zoom:80%;" />
+> <img src="images/image-20230120230506103.png" alt="image-20230120230506103" style="zoom:80%;" />
 >
 > And it passed all tests!
 >
 > I think there is also some problems within [this implementation](https://github.com/PKUFlyingPig/CS61A/blob/d10e4ad562614942fc3e5069b3a88f8cd7bd694f/projects/ants/ants.py#L242):
 >
-> <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120230705475.png" alt="image-20230120230705475" style="zoom:80%;" />
+> <img src="images/image-20230120230705475.png" alt="image-20230120230705475" style="zoom:80%;" />
 >
 > since it changes the size of the copy while iterating over it too.
 
@@ -1619,13 +1619,13 @@ And for more straight understanding of **iterating over a size-changing list** a
 >
 > > The first elements of both list bind to the same list.
 > >
-> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232042347.png" alt="image-20230120232042347" style="zoom:80%;" />
+> > <img src="images/image-20230120232042347.png" alt="image-20230120232042347" style="zoom:80%;" />
 > >
 > > But after `remove`, only element in `lst` was removed, and actually only the name and the binding relation were removed:
 > >
-> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232333420.png" alt="image-20230120232333420" style="zoom:80%;" />
+> > <img src="images/image-20230120232333420.png" alt="image-20230120232333420" style="zoom:80%;" />
 > >
-> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232346046.png" alt="image-20230120232346046" style="zoom:80%;" />
+> > <img src="images/image-20230120232346046.png" alt="image-20230120232346046" style="zoom:80%;" />
 >
 > **So we can see that the mechanism of `remove` is similar to "smart pointer" in C++ and the memory management of Java.**
 >
@@ -1640,13 +1640,13 @@ And for more straight understanding of **iterating over a size-changing list** a
 >
 > > The _ first refers to `[1, 2]`:
 > >
-> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232731439.png" alt="image-20230120232731439" style="zoom:80%;" />
+> > <img src="images/image-20230120232731439.png" alt="image-20230120232731439" style="zoom:80%;" />
 > >
 > > but after the size of container had changed, **the iterator skipped over `3` and referred to `4`**.
 > >
-> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232943226.png" alt="image-20230120232943226" style="zoom:80%;" />
+> > <img src="images/image-20230120232943226.png" alt="image-20230120232943226" style="zoom:80%;" />
 > >
-> > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120232959858.png" alt="image-20230120232959858" style="zoom:80%;" />
+> > <img src="images/image-20230120232959858.png" alt="image-20230120232959858" style="zoom:80%;" />
 
 In conclusion,
 
@@ -1658,11 +1658,11 @@ Back to this problem, how to write a safe and robust code?
 
 + First use our older way of accessing element with index instead of iterator:
 
-  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120235057766.png" alt="image-20230120235057766" style="zoom:80%;" />
+  > <img src="images/image-20230120235057766.png" alt="image-20230120235057766" style="zoom:80%;" />
 
 + Or we can modify one line of [this version](https://github.com/PKUFlyingPig/CS61A/blob/d10e4ad562614942fc3e5069b3a88f8cd7bd694f/projects/ants/ants.py#L242):
 
-  > <img src="/home/carolt/SelfEducating/Programming/cs61a/Notes/images/image-20230120230705475.png" alt="image-20230120230705475" style="zoom:80%;" />
+  > <img src="images/image-20230120230705475.png" alt="image-20230120230705475" style="zoom:80%;" />
   >
   > ```python
   > class FireAnt(Ant):
